@@ -1,0 +1,116 @@
+import java.util.*;
+import java.io.*;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static java.lang.Math.abs;
+
+public class MainakAndInterestingSequence {
+    static class FastReader {
+        BufferedReader br;
+        StringTokenizer st;
+
+        public FastReader() {
+            br = new BufferedReader(new InputStreamReader(System.in));
+        }
+
+        String next() {
+            while (st == null || !st.hasMoreTokens()) {
+                try {
+                    st = new StringTokenizer(br.readLine());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return st.nextToken();
+        }
+
+        int nextInt() {
+            return Integer.parseInt(next());
+        }
+
+        long nextLong() {
+            return Long.parseLong(next());
+        }
+
+        double nextDouble() {
+            return Double.parseDouble(next());
+        }
+
+        String nextLine() {
+            String str = "";
+            try {
+                str = br.readLine().trim();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return str;
+        }
+    }
+
+    static class FastWriter {
+        private final BufferedWriter bw;
+
+        public FastWriter() {
+            this.bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        }
+
+        public void print(Object object) throws IOException {
+            bw.append("" + object);
+        }
+
+        public void println() throws IOException {
+            bw.append("\n");
+        }
+
+        public void println(Object object) throws IOException {
+            print(object);
+            bw.append("\n");
+        }
+
+        public void close() throws IOException {
+            bw.close();
+        }
+    }
+
+    public static void main(String[] args) {
+        try {
+            FastReader fin = new FastReader();
+            FastWriter fout = new FastWriter();
+            int t = fin.nextInt();
+            while (t-- > 0) {
+                int n = fin.nextInt();
+                long m = fin.nextLong();
+                if (n > m || ((n & 1) == 0 && (m & 1) == 1)) {
+                    fout.print("No");
+                    fout.println();
+                    continue;
+                }
+                fout.print("Yes");
+                fout.println();
+                long[] ansArr = new long[n];
+                Arrays.fill(ansArr, 1);
+                if ((m&1) == 1) {
+                    ansArr[0] = m-n+1;
+                }
+                else{
+                    if((n&1)==0){
+                        ansArr[0] = (m-n+2)/2;
+                        ansArr[1] = (m-n+2)/2;
+                    }
+                    else{
+                        ansArr[0] = m-n+1;
+                    }
+                }
+                for (long ele : ansArr) {
+                    fout.print(ele + " ");
+                }
+                fout.println();
+            }
+
+            fout.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+    }
+}
