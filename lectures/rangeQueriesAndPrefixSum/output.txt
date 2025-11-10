@@ -1,0 +1,2 @@
+Error: Could not find or load main class ForestQueries
+Caused by: java.lang.NoClassDefFoundError: lectures/rangeQueriesAndPrefixSum/ForestQueries (wrong name: ForestQueries)
