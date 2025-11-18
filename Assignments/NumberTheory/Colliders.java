@@ -1,8 +1,5 @@
 import java.util.*;
 import java.io.*;
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-import static java.lang.Math.abs;
 
 public class Colliders {
 
@@ -86,20 +83,6 @@ public class Colliders {
             println();
         }
     }
-    public static long[] getSpfArray(int n){
-        long[] spfArray = new long[n+1];
-        for (int i = 0; i < n+1; i++) {
-            spfArray[i] = i;
-        }
-        for(int i = 2; i*i<=n; i++){
-            if(spfArray[i] == i) { // that means its a prime number
-                for (int j = i*i; j <=n; j+=i) {
-                    spfArray[j] = i;
-                }
-            }
-        }
-        return spfArray;
-    }
 
     public static void main(String[] args) {
         try {
@@ -108,33 +91,49 @@ public class Colliders {
 
             int n = fin.nextInt();
             int m = fin.nextInt();
-            long[] spfArray = getSpfArray(n);
-            Map<Long,Integer> spftoValueMap = new HashMap<>();
-            while(m-- >0){
+            Map<Integer, Integer> primeFactorsToValueMap = new HashMap<Integer, Integer>();
+            boolean[] astroids = new boolean[n+1];
+            while (m-- > 0) {
                 String str = fin.nextLine();
                 char ch = str.charAt(0);
                 int val = Integer.parseInt(str.split(" ")[1]);
-                Long currentSpfValue = spfArray[val];
-                if(ch =='+'){
-                    if(spftoValueMap.containsValue(val)){
+                if (ch == '+') {
+                    boolean isPrimeFactorPresent = false;
+                    if (astroids[val]) {
                         fout.println("Already on");
-                    }
-                    else if(spftoValueMap.containsKey(currentSpfValue)){
-                        fout.println("Conflict with " + spftoValueMap.get(currentSpfValue));
-                    }
-                    else{
-                        fout.println("Success");
-                        spftoValueMap.put(currentSpfValue,val);
-                    }
-                }
-                else {
-                    if(spftoValueMap.containsValue(val)){
-                        spftoValueMap.remove(currentSpfValue);
-                        fout.println("Success");
-                    }
-                    else {
+                        continue;
+                    } else {
+                        List<Integer> primeFactors = getPrimeFactors(val);
+                        for(Integer pf: primeFactors){
+                            if(primeFactorsToValueMap.containsKey(pf)){
+                                isPrimeFactorPresent = true;
+                                fout.println("Conflict with " + primeFactorsToValueMap.get(pf));
+                                break;
+                            }
+                        }
+                        if(!isPrimeFactorPresent) {
+                                fout.println("Success");
+                                astroids[val] = true;
+                                primeFactorsToValueMap.putAll(primeFactors.stream().collect(
+                                        HashMap::new,
+                                        (map, key) -> map.put(key, val),
+                                        HashMap::putAll
+                                ));
+                            }
+                        }
+                } else {
+                    if (!astroids[val]) {
                         fout.println("Already off");
+                        continue;
                     }
+                    astroids[val]=false;
+                    List<Integer> factors = getPrimeFactors(val);
+                    for (int p : factors) {
+                        if (primeFactorsToValueMap.get(p) == val)
+                            primeFactorsToValueMap.remove(p);
+                    }
+                 //   primeFactorsToValueMap.values().removeIf(v -> v == val);
+                    fout.println("Success");
                 }
             }
             fout.close();
@@ -142,5 +141,20 @@ public class Colliders {
             e.printStackTrace();
             return;
         }
+    }
+
+    private static List<Integer> getPrimeFactors(int val) {
+        List<Integer> primeFactors = new ArrayList<>();
+        for(int i = 2; i*i <= val; i++){
+            if(val%i==0){
+                primeFactors.add(i);
+                while(val%i == 0){
+                    val/=i;
+                }
+            }
+
+        }
+        if(val>1) primeFactors.add(val);
+        return primeFactors;
     }
 }
