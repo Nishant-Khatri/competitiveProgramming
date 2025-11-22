@@ -1,11 +1,9 @@
 import java.util.*;
 import java.io.*;
-
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.abs;
-
-public class ArrayDescription {
+public class EditDistance {
     public static int mod = (int) 1e9 + 7;
 
     static class FastReader {
@@ -89,40 +87,35 @@ public class ArrayDescription {
         }
     }
 
-    public static void main
-            (String[] args) {
+    public static void main(String[] args) {
         try {
             FastReader fin = new FastReader();
             FastWriter fout = new FastWriter();
-
-            int n = fin.nextInt();
-            int m = fin.nextInt();
-            int[] arr = new int[n];
-            for (int i = 0; i < n; i++) {
-                arr[i] = fin.nextInt();
-            }
-            long[][] dp = new long[n + 1][m + 2];
-            if (arr[0] == 0) {
-                for (int i = 1; i <= m; i++) {
-                    dp[0][i] = 1;
-                }
-            } else {
-                dp[0][arr[0]] = 1;
-            }
-            for (int i = 1; i < n; i++) {
-                if (arr[i] == 0) {
-                    for (int j = 1; j <= m; j++) {
-                        dp[i][j] = ((dp[i - 1][j] + dp[i - 1][j + 1]) % mod + dp[i - 1][j - 1]) % mod;
+            String A = fin.nextLine();
+            String B = fin.nextLine();
+            int n = A.length();
+            int m = B.length();
+            int[][] dp = new int[n + 1][m + 1];
+            for (int i = 0; i <= n; i++) {
+                for (int j = 0; j <= m; j++) {
+                    if (i == 0) {
+                        dp[i][j] = j;
+                    } else if (j == 0) {
+                        dp[i][j] = i;
+                    } else if (A.charAt(i - 1) == B.charAt(j - 1)) {
+                        dp[i][j] = dp[i - 1][j - 1];
+                    } else {
+                        // remove
+                        int remove = dp[i - 1][j];
+                        // insert
+                        int insert = dp[i][j - 1];
+                        // replace
+                        int replace = dp[i - 1][j - 1];
+                        dp[i][j] = 1 + min(remove, min(insert, replace));
                     }
-                } else {
-                    dp[i][arr[i]] = ((dp[i - 1][arr[i]] + dp[i - 1][arr[i] + 1]) % mod + dp[i - 1][arr[i] - 1]) % mod;
                 }
             }
-            long finalAns = 0L;
-            for (int i = 1; i <= m; i++) {
-                finalAns = (finalAns + dp[n - 1][i]) % mod;
-            }
-            fout.print(finalAns);
+            fout.println(dp[n][m]);
             fout.close();
         } catch (Exception e) {
             e.printStackTrace();

@@ -1,11 +1,10 @@
 import java.util.*;
 import java.io.*;
-
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.abs;
 
-public class ArrayDescription {
+public class DivGame {
     public static int mod = (int) 1e9 + 7;
 
     static class FastReader {
@@ -95,38 +94,42 @@ public class ArrayDescription {
             FastReader fin = new FastReader();
             FastWriter fout = new FastWriter();
 
-            int n = fin.nextInt();
-            int m = fin.nextInt();
-            int[] arr = new int[n];
-            for (int i = 0; i < n; i++) {
-                arr[i] = fin.nextInt();
-            }
-            long[][] dp = new long[n + 1][m + 2];
-            if (arr[0] == 0) {
-                for (int i = 1; i <= m; i++) {
-                    dp[0][i] = 1;
+            long n = fin.nextLong();
+            int ans =0;
+            Map<Long,Integer> primeFactorToPowerMap = getPrimeFatorToPowerMap(n);
+            for (Map.Entry<Long, Integer> entry : primeFactorToPowerMap.entrySet()) {
+                Integer power = entry.getValue();
+                int idx = 1;
+                while(power-idx>=0){
+                    power-=idx;
+                    idx++;
                 }
-            } else {
-                dp[0][arr[0]] = 1;
+                ans+=idx-1;
             }
-            for (int i = 1; i < n; i++) {
-                if (arr[i] == 0) {
-                    for (int j = 1; j <= m; j++) {
-                        dp[i][j] = ((dp[i - 1][j] + dp[i - 1][j + 1]) % mod + dp[i - 1][j - 1]) % mod;
-                    }
-                } else {
-                    dp[i][arr[i]] = ((dp[i - 1][arr[i]] + dp[i - 1][arr[i] + 1]) % mod + dp[i - 1][arr[i] - 1]) % mod;
-                }
-            }
-            long finalAns = 0L;
-            for (int i = 1; i <= m; i++) {
-                finalAns = (finalAns + dp[n - 1][i]) % mod;
-            }
-            fout.print(finalAns);
+            fout.print(ans);
             fout.close();
         } catch (Exception e) {
             e.printStackTrace();
             return;
         }
+    }
+
+    private static Map<Long, Integer> getPrimeFatorToPowerMap(long n) {
+        Map<Long,Integer> primeFactorToPowerMap = new HashMap<>();
+        for(long i = 2; i*i <= n; i++) {
+        if(n%i==0){
+            int power = 0;
+            while (n%i==0){
+                n/=i;
+                power++;
+            }
+            primeFactorToPowerMap.put(i,power);
+        }
+        }
+        if(n>1){
+            primeFactorToPowerMap.put(n,1);
+        }
+
+        return primeFactorToPowerMap;
     }
 }
