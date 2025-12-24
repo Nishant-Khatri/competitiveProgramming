@@ -1,11 +1,9 @@
 import java.util.*;
 import java.io.*;
-
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.abs;
-
-public class ArrayDescription {
+public class IncreasingSubsequence {
     public static int mod = (int) 1e9 + 7;
 
     static class FastReader {
@@ -96,37 +94,41 @@ public class ArrayDescription {
             FastWriter fout = new FastWriter();
 
             int n = fin.nextInt();
-            int m = fin.nextInt();
             int[] arr = new int[n];
             for (int i = 0; i < n; i++) {
                 arr[i] = fin.nextInt();
             }
-            long[][] dp = new long[n + 1][m + 2];
-            if (arr[0] == 0) {
-                for (int i = 1; i <= m; i++) {
-                    dp[0][i] = 1;
-                }
-            } else {
-                dp[0][arr[0]] = 1;
+            List<Integer> dp = new ArrayList<>();
+
+            for (int i = 0; i < n ; i++) {
+              if(dp.isEmpty() || arr[i]> dp.get(dp.size()-1)) {
+                  dp.add(arr[i]);
+              }
+              else{
+                  int index = findIndexOfSmallestNumberGreaterThanOrEqualToX(arr[i], dp);
+                  dp.set(index,arr[i]);
+              }
             }
-            for (int i = 1; i < n; i++) {
-                if (arr[i] == 0) {
-                    for (int j = 1; j <= m; j++) {
-                        dp[i][j] = ((dp[i - 1][j] + dp[i - 1][j + 1]) % mod + dp[i - 1][j - 1]) % mod;
-                    }
-                } else {
-                    dp[i][arr[i]] = ((dp[i - 1][arr[i]] + dp[i - 1][arr[i] + 1]) % mod + dp[i - 1][arr[i] - 1]) % mod;
-                }
-            }
-            long finalAns = 0L;
-            for (int i = 1; i <= m; i++) {
-                finalAns = (finalAns + dp[n - 1][i]) % mod;
-            }
-            fout.print(finalAns);
+            fout.print(dp.size());
             fout.close();
         } catch (Exception e) {
             e.printStackTrace();
             return;
         }
+    }
+
+    private static int findIndexOfSmallestNumberGreaterThanOrEqualToX(int X, List<Integer> dp) {
+        int left = 0;
+        int right = dp.size() - 1;
+        while(left<=right){
+            int mid = (right - left)/2 + left;
+            if(dp.get(mid) >= X){
+                right = mid - 1;
+            }
+            else{
+                left = mid + 1;
+            }
+        }
+        return left;
     }
 }

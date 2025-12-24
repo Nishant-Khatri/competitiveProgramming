@@ -5,7 +5,7 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.abs;
 
-public class ArrayDescription {
+public class Candies {
     public static int mod = (int) 1e9 + 7;
 
     static class FastReader {
@@ -87,6 +87,13 @@ public class ArrayDescription {
             }
             println();
         }
+
+        public void print2dArray(long[][] arr) throws IOException {
+            for (long[] arr1 : arr) {
+                printLongArr(arr1);
+                println();
+            }
+        }
     }
 
     public static void main
@@ -96,33 +103,34 @@ public class ArrayDescription {
             FastWriter fout = new FastWriter();
 
             int n = fin.nextInt();
-            int m = fin.nextInt();
-            int[] arr = new int[n];
-            for (int i = 0; i < n; i++) {
+            int k = fin.nextInt();
+            int[] arr = new int[n + 1];
+            for (int i = 1; i <= n; i++) {
                 arr[i] = fin.nextInt();
             }
-            long[][] dp = new long[n + 1][m + 2];
-            if (arr[0] == 0) {
-                for (int i = 1; i <= m; i++) {
-                    dp[0][i] = 1;
-                }
-            } else {
-                dp[0][arr[0]] = 1;
-            }
-            for (int i = 1; i < n; i++) {
-                if (arr[i] == 0) {
-                    for (int j = 1; j <= m; j++) {
-                        dp[i][j] = ((dp[i - 1][j] + dp[i - 1][j + 1]) % mod + dp[i - 1][j - 1]) % mod;
-                    }
+            long[][] dp = new long[n + 1][k + 2];
+            for (int i = 0; i <= k; i++) {
+                if (arr[1] >= i) {
+                    dp[1][i] = 1;
                 } else {
-                    dp[i][arr[i]] = ((dp[i - 1][arr[i]] + dp[i - 1][arr[i] + 1]) % mod + dp[i - 1][arr[i] - 1]) % mod;
+                    dp[1][i] = 0;
                 }
             }
-            long finalAns = 0L;
-            for (int i = 1; i <= m; i++) {
-                finalAns = (finalAns + dp[n - 1][i]) % mod;
+            for (int i = 2; i <= n; i++) {
+                long prefixSumArray[] = new long[k + 1];
+                prefixSumArray[0] = dp[i - 1][0];
+                for (int j = 1; j <= k; j++) {
+                    prefixSumArray[j] = prefixSumArray[j - 1] % mod + dp[i - 1][j];
+                }
+                for (int j = 0; j <= k; j++) {
+                    dp[i][j] = prefixSumArray[j] % mod;
+                    if ((j - arr[i] - 1) >= 0) {
+                        dp[i][j] = (dp[i][j] % mod - prefixSumArray[j - arr[i] - 1] % mod + mod) % mod;
+                    }
+                }
             }
-            fout.print(finalAns);
+            fout.print(dp[n][k]);
+
             fout.close();
         } catch (Exception e) {
             e.printStackTrace();

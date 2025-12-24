@@ -4,8 +4,9 @@ import java.io.*;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.abs;
+import static java.util.Arrays.fill;
 
-public class ArrayDescription {
+public class MakeThemEqual {
     public static int mod = (int) 1e9 + 7;
 
     static class FastReader {
@@ -87,42 +88,66 @@ public class ArrayDescription {
             }
             println();
         }
+
+        public void print2dArray(int[][] arr) throws IOException {
+            for (int[] arr1 : arr) {
+                printIntArr(arr1);
+                println();
+            }
+        }
     }
 
-    public static void main
-            (String[] args) {
+    public static void main(String[] args) {
         try {
             FastReader fin = new FastReader();
             FastWriter fout = new FastWriter();
-
-            int n = fin.nextInt();
-            int m = fin.nextInt();
-            int[] arr = new int[n];
-            for (int i = 0; i < n; i++) {
-                arr[i] = fin.nextInt();
-            }
-            long[][] dp = new long[n + 1][m + 2];
-            if (arr[0] == 0) {
-                for (int i = 1; i <= m; i++) {
-                    dp[0][i] = 1;
-                }
-            } else {
-                dp[0][arr[0]] = 1;
-            }
-            for (int i = 1; i < n; i++) {
-                if (arr[i] == 0) {
-                    for (int j = 1; j <= m; j++) {
-                        dp[i][j] = ((dp[i - 1][j] + dp[i - 1][j + 1]) % mod + dp[i - 1][j - 1]) % mod;
+            int[] numberOfOperation = new int[1005];
+            fill(numberOfOperation, Integer.MAX_VALUE);
+            numberOfOperation[1] = 0;
+            for (int i = 1; i <= 1000; i++) {
+                for (int j = 1; j <= 1000; j++) {
+                    int g = (i + (i / j));
+                    if (g < 1001) {
+                        numberOfOperation[g] = min(numberOfOperation[g], numberOfOperation[i] + 1);
                     }
-                } else {
-                    dp[i][arr[i]] = ((dp[i - 1][arr[i]] + dp[i - 1][arr[i] + 1]) % mod + dp[i - 1][arr[i] - 1]) % mod;
                 }
             }
-            long finalAns = 0L;
-            for (int i = 1; i <= m; i++) {
-                finalAns = (finalAns + dp[n - 1][i]) % mod;
+            int t = fin.nextInt();
+            while (t-- > 0) {
+                int n = fin.nextInt();
+                int k = fin.nextInt();
+                int[] B = new int[n + 1];
+                int maxB = -1;
+                for (int i = 1; i < n + 1; i++) {
+                    B[i] = fin.nextInt();
+                    maxB = max(B[i], maxB);
+                }
+                int[] C = new int[n + 1];
+                for (int i = 1; i < n + 1; i++) {
+                    C[i] = fin.nextInt();
+                }
+                int maxK = n * numberOfOperation[maxB];
+                k = min(maxK, k);
+
+                int[] dp = new int[k + 1];
+                //  dp[j] = maximum coins obtainable using AT MOST j operations
+                // Don’t take the item
+                //→ coins remain dp[j]
+                //
+                //Take the item (only if j(current operations) >= c(operation Needed))
+                //→ coins become dp[j - c] + v(coins gained)
+
+                for (int i = 1; i <= n; i++) {
+                    int currentNumberOfOperations = numberOfOperation[B[i]];
+                    int value = C[i];
+
+                    // normal 0/1 knapsack reverted loop for selecting 1 item atmost 1 time
+                    for (int j = k; j >= currentNumberOfOperations; j--) {
+                        dp[j] = Math.max(dp[j], dp[j - currentNumberOfOperations] + value);
+                    }
+                }
+                fout.println(dp[k]);
             }
-            fout.print(finalAns);
             fout.close();
         } catch (Exception e) {
             e.printStackTrace();

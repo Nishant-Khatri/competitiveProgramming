@@ -1,6 +1,1 @@
-java.lang.NullPointerException
-	at java.base/java.util.StringTokenizer.<init>(StringTokenizer.java:199)
-	at java.base/java.util.StringTokenizer.<init>(StringTokenizer.java:236)
-	at OracAndModels$FastReader.next(OracAndModels.java:22)
-	at OracAndModels$FastReader.nextInt(OracAndModels.java:31)
-	at OracAndModels.main(OracAndModels.java:142)
+2

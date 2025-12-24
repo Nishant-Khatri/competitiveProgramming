@@ -1,11 +1,11 @@
+
 import java.util.*;
 import java.io.*;
-
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.abs;
 
-public class ArrayDescription {
+public class AddOne {
     public static int mod = (int) 1e9 + 7;
 
     static class FastReader {
@@ -94,35 +94,41 @@ public class ArrayDescription {
         try {
             FastReader fin = new FastReader();
             FastWriter fout = new FastWriter();
-
-            int n = fin.nextInt();
-            int m = fin.nextInt();
-            int[] arr = new int[n];
-            for (int i = 0; i < n; i++) {
-                arr[i] = fin.nextInt();
-            }
-            long[][] dp = new long[n + 1][m + 2];
-            if (arr[0] == 0) {
-                for (int i = 1; i <= m; i++) {
-                    dp[0][i] = 1;
-                }
-            } else {
-                dp[0][arr[0]] = 1;
-            }
-            for (int i = 1; i < n; i++) {
-                if (arr[i] == 0) {
-                    for (int j = 1; j <= m; j++) {
-                        dp[i][j] = ((dp[i - 1][j] + dp[i - 1][j + 1]) % mod + dp[i - 1][j - 1]) % mod;
+                long[] numberOfDigitsInTransformingZeroAfterIOpn = new long[200020];
+                long[] previousArrContainingFrequencyOfDigits = new long[10];
+                long[] currentArrContainingFrequencyOfDigits = new long[10];
+                Arrays.fill(previousArrContainingFrequencyOfDigits,0);
+                previousArrContainingFrequencyOfDigits[0] = 1;
+                for(int j = 1; j<=200010; j++){
+                    long sumOfNumberOfDigits = 0;
+                    currentArrContainingFrequencyOfDigits[0] = previousArrContainingFrequencyOfDigits[9]%mod;
+                    currentArrContainingFrequencyOfDigits[1] = (previousArrContainingFrequencyOfDigits[0]%mod + previousArrContainingFrequencyOfDigits[9]%mod)%mod;
+                    currentArrContainingFrequencyOfDigits[2] = previousArrContainingFrequencyOfDigits[1]%mod;
+                    currentArrContainingFrequencyOfDigits[3] = previousArrContainingFrequencyOfDigits[2]%mod;
+                    currentArrContainingFrequencyOfDigits[4] = previousArrContainingFrequencyOfDigits[3]%mod;
+                    currentArrContainingFrequencyOfDigits[5] = previousArrContainingFrequencyOfDigits[4]%mod;
+                    currentArrContainingFrequencyOfDigits[6] = previousArrContainingFrequencyOfDigits[5]%mod;
+                    currentArrContainingFrequencyOfDigits[7] = previousArrContainingFrequencyOfDigits[6]%mod;
+                    currentArrContainingFrequencyOfDigits[8] = previousArrContainingFrequencyOfDigits[7]%mod;
+                    currentArrContainingFrequencyOfDigits[9] = previousArrContainingFrequencyOfDigits[8]%mod;
+                    for (int i = 0; i < 10; i++) {
+                        previousArrContainingFrequencyOfDigits[i] = currentArrContainingFrequencyOfDigits[i];
+                        sumOfNumberOfDigits = (sumOfNumberOfDigits%mod + currentArrContainingFrequencyOfDigits[i]%mod)%mod;
                     }
-                } else {
-                    dp[i][arr[i]] = ((dp[i - 1][arr[i]] + dp[i - 1][arr[i] + 1]) % mod + dp[i - 1][arr[i] - 1]) % mod;
+                    numberOfDigitsInTransformingZeroAfterIOpn[j] = sumOfNumberOfDigits%mod;
                 }
-            }
-            long finalAns = 0L;
-            for (int i = 1; i <= m; i++) {
-                finalAns = (finalAns + dp[n - 1][i]) % mod;
-            }
-            fout.print(finalAns);
+                int t = fin.nextInt();
+                while(t-- > 0) {
+                    long n = fin.nextLong();
+                    int m = fin.nextInt();
+                    long res = 0L;
+                    while(n>0){
+                        int ld = (int)(n%10);
+                        res = (res%mod+numberOfDigitsInTransformingZeroAfterIOpn[m+ld]%mod)%mod;
+                        n/=10;
+                    }
+                    fout.println(res);
+                }
             fout.close();
         } catch (Exception e) {
             e.printStackTrace();

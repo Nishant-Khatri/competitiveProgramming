@@ -5,7 +5,7 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.abs;
 
-public class ArrayDescription {
+public class RectangleCutting {
     public static int mod = (int) 1e9 + 7;
 
     static class FastReader {
@@ -97,32 +97,28 @@ public class ArrayDescription {
 
             int n = fin.nextInt();
             int m = fin.nextInt();
-            int[] arr = new int[n];
-            for (int i = 0; i < n; i++) {
-                arr[i] = fin.nextInt();
+            long[][] dp = new long[n + 1][m + 1];
+            for (int i = 0; i <= n; i++) {
+                Arrays.fill(dp[i], Long.MAX_VALUE);
             }
-            long[][] dp = new long[n + 1][m + 2];
-            if (arr[0] == 0) {
-                for (int i = 1; i <= m; i++) {
-                    dp[0][i] = 1;
-                }
-            } else {
-                dp[0][arr[0]] = 1;
-            }
-            for (int i = 1; i < n; i++) {
-                if (arr[i] == 0) {
-                    for (int j = 1; j <= m; j++) {
-                        dp[i][j] = ((dp[i - 1][j] + dp[i - 1][j + 1]) % mod + dp[i - 1][j - 1]) % mod;
+
+            for (int i = 1; i <= n; i++) {
+                for (int j = 1; j <= m; j++) {
+                    if (i == j) {
+                        dp[i][j] = 0;
+                        continue;
                     }
-                } else {
-                    dp[i][arr[i]] = ((dp[i - 1][arr[i]] + dp[i - 1][arr[i] + 1]) % mod + dp[i - 1][arr[i] - 1]) % mod;
+                    for (int k = 1; k <= j - 1; k++) {
+                        dp[i][j] = min(dp[i][j], dp[i][j - k] + dp[i][k] + 1);
+
+                    }
+                    for (int k = 1; k <= i - 1; k++) {
+                        dp[i][j] = min(dp[i][j], dp[k][j] + dp[i - k][j] + 1);
+
+                    }
                 }
             }
-            long finalAns = 0L;
-            for (int i = 1; i <= m; i++) {
-                finalAns = (finalAns + dp[n - 1][i]) % mod;
-            }
-            fout.print(finalAns);
+            fout.print(dp[n][m]);
             fout.close();
         } catch (Exception e) {
             e.printStackTrace();

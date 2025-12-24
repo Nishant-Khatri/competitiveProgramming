@@ -1,12 +1,9 @@
 import java.util.*;
 import java.io.*;
-
 import static java.lang.Math.max;
-import static java.lang.Math.min;
-import static java.lang.Math.abs;
 
-public class ArrayDescription {
-    public static int mod = (int) 1e9 + 7;
+public class BetweenTwoArrays {
+    public static int mod = 998244353;
 
     static class FastReader {
         BufferedReader br;
@@ -87,6 +84,12 @@ public class ArrayDescription {
             }
             println();
         }
+        public void print2dArray(long[][] arr) throws IOException {
+            for(long [] arr1: arr){
+                printLongArr(arr1);
+                println();
+            }
+        }
     }
 
     public static void main
@@ -96,33 +99,45 @@ public class ArrayDescription {
             FastWriter fout = new FastWriter();
 
             int n = fin.nextInt();
-            int m = fin.nextInt();
-            int[] arr = new int[n];
-            for (int i = 0; i < n; i++) {
-                arr[i] = fin.nextInt();
+            int[] arrA = new int[n+1];
+            int maxArrA= -1;
+            for (int i = 1; i <= n; i++) {
+                arrA[i] = fin.nextInt();
+                maxArrA = max(maxArrA,arrA[i]);
             }
-            long[][] dp = new long[n + 1][m + 2];
-            if (arr[0] == 0) {
-                for (int i = 1; i <= m; i++) {
-                    dp[0][i] = 1;
-                }
-            } else {
-                dp[0][arr[0]] = 1;
+            int[] arrB = new int[n+1];
+            for (int i = 1; i <= n; i++) {
+                arrB[i] = fin.nextInt();
+                maxArrA = max(maxArrA,arrB[i]);
             }
-            for (int i = 1; i < n; i++) {
-                if (arr[i] == 0) {
-                    for (int j = 1; j <= m; j++) {
-                        dp[i][j] = ((dp[i - 1][j] + dp[i - 1][j + 1]) % mod + dp[i - 1][j - 1]) % mod;
+            long[][] dp = new long[n+1][maxArrA+2];
+            for(long[] x: dp){
+                Arrays.fill(x,0);
+            }
+
+            for (int j = arrA[1]; j <=arrB[1] ; j++) {
+                dp[1][j] = 1;
+            }
+            for(int i = 2; i <=n ; i++) {
+                long prefixSum =0L;
+                    for (int j = 0; j <= maxArrA; j++) {
+                        prefixSum = (prefixSum%mod + dp[i-1][j]%mod)%mod;
+                        if(arrA[i] <= j && j <=arrB[i]){
+                            dp[i][j] = prefixSum;
+                        }
+                        else {
+                            dp[i][j] = 0;
+                        }
                     }
-                } else {
-                    dp[i][arr[i]] = ((dp[i - 1][arr[i]] + dp[i - 1][arr[i] + 1]) % mod + dp[i - 1][arr[i] - 1]) % mod;
                 }
+
+            long ans=0L;
+
+            for (int j = 0; j <= maxArrA ; j++) {
+                ans= (ans%mod+dp[n][j]%mod)%mod;
             }
-            long finalAns = 0L;
-            for (int i = 1; i <= m; i++) {
-                finalAns = (finalAns + dp[n - 1][i]) % mod;
-            }
-            fout.print(finalAns);
+
+            fout.print(ans);
             fout.close();
         } catch (Exception e) {
             e.printStackTrace();
