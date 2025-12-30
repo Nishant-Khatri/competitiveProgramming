@@ -5,8 +5,8 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.abs;
 
-public class ClassyNumbers {
-    public static int mod = (int) (1e9 + 7);
+public class CountingNumbers {
+    public static int mod = (int) 1e9 + 7;
 
     static class FastReader {
         BufferedReader br;
@@ -89,60 +89,37 @@ public class ClassyNumbers {
         }
     }
 
-    public static long countNumbers(int pos, int isTight, int cnt, String k, long[][][] dp) {
+    private static long countNumbers(int pos, String k, int isTight, int lastDigit, long[][][] dp) {
         if (pos == k.length() + 1) {
-            return cnt <= 3 ? 1 : 0;
+            return 1;
         }
-        if(cnt>3) return 0;
-        if (dp[pos][isTight][cnt] != -1)
-            return dp[pos][isTight][cnt];
-        int limit = isTight == 1 ? (int) (k.charAt(pos - 1) - '0') : 9;
+        //dp
+        if (lastDigit != -1 && dp[pos][isTight][lastDigit] != -1) {
+            return dp[pos][isTight][lastDigit];
+        }
         long ans = 0;
+        int limit = isTight == 1 ? (int) (k.charAt(pos - 1) - '0') : 9;
         for (int digit = 0; digit <= limit; digit++) {
+            if (lastDigit != -1 && digit == lastDigit) continue;
             int newTight = (isTight == 1) && (digit == limit) ? 1 : 0;
-            if(digit == 0){
-                ans+= countNumbers(pos+1, newTight, cnt, k, dp);
-            }else{
-                ans+= countNumbers(pos+1, newTight, cnt+1, k, dp);
-            }
+            int newLastDigit = lastDigit == -1 && digit == 0 ? -1 : digit;
+            ans += countNumbers(pos + 1, k, newTight, newLastDigit, dp);
         }
-        return dp[pos][isTight][cnt] = ans;
+        if (lastDigit != -1) {
+            dp[pos][isTight][lastDigit] = ans;
+        }
+        return ans;
     }
 
-    public static void solve(Long l, Long r, FastReader fin, FastWriter fout) throws IOException {
-        String rStr = Long.toString(r);
-        String lStr = Long.toString(l - 1);
-        long dp[][][] = new long[rStr.length() + 10][2][4];
-        for (int i = 0; i < dp.length; i++) {
-            for (int j = 0; j < dp[0].length; j++) {
-                for (int j2 = 0; j2 < dp[0][0].length; j2++) {
-                    dp[i][j][j2] = -1;
-                }
-            }
-        }
-        long dp2[][][] = new long[lStr.length() + 10][2][4];
-        for (int i = 0; i < dp2.length; i++) {
-            for (int j = 0; j < dp2[0].length; j++) {
-                for (int j2 = 0; j2 < dp2[0][0].length; j2++) {
-                    dp2[i][j][j2] = -1;
-                }
-            }
-        }
-        fout.println(countNumbers(1, 1, 0, rStr, dp) - countNumbers(1, 1, 0, lStr, dp2));
-    }
-
-    public static void main(String[] args) {
+    public static void main
+            (String[] args) {
         try {
             FastReader fin = new FastReader();
             FastWriter fout = new FastWriter();
-            int t = fin.nextInt();
-            while (t-- > 0) {
-                Long l = fin.nextLong();
-                Long r = fin.nextLong();
-                solve(l, r, fin, fout);
-            }
-            // }
 
+            long a = fin.nextLong();
+            long b = fin.nextLong();
+            solve(a, b, fout);
             fout.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -150,4 +127,24 @@ public class ClassyNumbers {
         }
     }
 
+
+    private static void solve(long l, long r, FastWriter fout) throws IOException {
+        String lStr = Long.toString(l - 1);
+        String rStr = Long.toString(r);
+        // add dp arrays here
+        long[][][] dp1 = new long[lStr.length() + 10][2][10];
+        for (int i = 0; i < dp1.length; i++) {
+            for (int j = 0; j < 2; j++) {
+                Arrays.fill(dp1[i][j], -1);
+            }
+        }
+        long[][][] dp2 = new long[rStr.length() + 10][2][10];
+        for (int i = 0; i < dp2.length; i++) {
+            for (int j = 0; j < 2; j++) {
+                Arrays.fill(dp2[i][j], -1);
+            }
+        }
+        fout.println(countNumbers(1, rStr, 1, -1, dp2) - countNumbers(1, lStr, 1, -1, dp1));
+
+    }
 }

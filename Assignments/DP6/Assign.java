@@ -1,12 +1,10 @@
 import java.util.*;
 import java.io.*;
-
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.abs;
-
-public class ClassyNumbers {
-    public static int mod = (int) (1e9 + 7);
+public class Assign {
+    public static int mod = (int) 1e9 + 7;
 
     static class FastReader {
         BufferedReader br;
@@ -88,66 +86,46 @@ public class ClassyNumbers {
             println();
         }
     }
-
-    public static long countNumbers(int pos, int isTight, int cnt, String k, long[][][] dp) {
-        if (pos == k.length() + 1) {
-            return cnt <= 3 ? 1 : 0;
+    public static long helper(int[][] mat,int mask,int size, long[]dp){
+        int student = Integer.bitCount(mask);
+        if( student>=size){
+            return 1;
         }
-        if(cnt>3) return 0;
-        if (dp[pos][isTight][cnt] != -1)
-            return dp[pos][isTight][cnt];
-        int limit = isTight == 1 ? (int) (k.charAt(pos - 1) - '0') : 9;
+        if(dp[mask]!=-1){
+            return dp[mask];
+        }
         long ans = 0;
-        for (int digit = 0; digit <= limit; digit++) {
-            int newTight = (isTight == 1) && (digit == limit) ? 1 : 0;
-            if(digit == 0){
-                ans+= countNumbers(pos+1, newTight, cnt, k, dp);
-            }else{
-                ans+= countNumbers(pos+1, newTight, cnt+1, k, dp);
+        for (int topic = 0; topic < size; topic++) {
+            int currentMask = 1<<topic;
+            if((mask&currentMask) == 0 && mat[student][topic]==1) {
+                ans += helper(mat, mask | currentMask, size,dp);
             }
         }
-        return dp[pos][isTight][cnt] = ans;
+        return dp[mask]=ans;
     }
-
-    public static void solve(Long l, Long r, FastReader fin, FastWriter fout) throws IOException {
-        String rStr = Long.toString(r);
-        String lStr = Long.toString(l - 1);
-        long dp[][][] = new long[rStr.length() + 10][2][4];
-        for (int i = 0; i < dp.length; i++) {
-            for (int j = 0; j < dp[0].length; j++) {
-                for (int j2 = 0; j2 < dp[0][0].length; j2++) {
-                    dp[i][j][j2] = -1;
-                }
-            }
-        }
-        long dp2[][][] = new long[lStr.length() + 10][2][4];
-        for (int i = 0; i < dp2.length; i++) {
-            for (int j = 0; j < dp2[0].length; j++) {
-                for (int j2 = 0; j2 < dp2[0][0].length; j2++) {
-                    dp2[i][j][j2] = -1;
-                }
-            }
-        }
-        fout.println(countNumbers(1, 1, 0, rStr, dp) - countNumbers(1, 1, 0, lStr, dp2));
-    }
-
-    public static void main(String[] args) {
+    public static void main
+            (String[] args) {
         try {
             FastReader fin = new FastReader();
             FastWriter fout = new FastWriter();
-            int t = fin.nextInt();
-            while (t-- > 0) {
-                Long l = fin.nextLong();
-                Long r = fin.nextLong();
-                solve(l, r, fin, fout);
-            }
-            // }
 
+            int t = fin.nextInt();
+            while(t-- > 0) {
+                int n = fin.nextInt();
+                int[][] likabilityMatrix = new int[n][n];
+                for (int i = 0; i < n; i++) {
+                    for (int j = 0; j < n; j++) {
+
+                        likabilityMatrix[i][j] = fin.nextInt();                    }
+            }
+                long[] dp = new long [1<<(n + 1)];
+                    Arrays.fill(dp,-1);
+                fout.println(helper(likabilityMatrix,0,n,dp));
+            }
             fout.close();
         } catch (Exception e) {
             e.printStackTrace();
             return;
         }
     }
-
 }
